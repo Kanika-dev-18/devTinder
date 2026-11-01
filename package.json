@@ -1,0 +1,14 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+   "dev" : "nodemon src/app.js"
+  },
+  "author": "kanika",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
