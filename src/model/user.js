@@ -2,22 +2,42 @@ const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
     firstName: {
-        type: String
+        type: String,
+        required: true,
+        trim: true,
+        minLength: 2,
+        maxLength: 50
     },
     lastName: {
-        type: String
+        type: String,
+        required: true,
+        trim: true,
+        minLength: 2,
+        maxLength: 50
     },
     emailId: {
-        type: String
+        type: String,
+        required: true,
+        lowercase: true,
+        trim: true,
+        match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     },
     password: {
-        type: String
+        type: String,
+        required: true,
+        minLength: 8
     },
     age: {
-        type: Number
+        type: Number,
+        required: true,
+        min: 18
     },
     gender: {
-        type: String
+        type: String,
+        required: true,
+        lowercase: true,
+        trim: true,
+        enum: ['male', 'female', 'other']
     },
 });
 
