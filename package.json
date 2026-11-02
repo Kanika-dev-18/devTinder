@@ -4,11 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-   "dev" : "nodemon src/app.js"
+    "dev": "nodemon src/app.js"
   },
   "author": "kanika",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "mongoose": "^9.11.4"
   }
 }

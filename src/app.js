@@ -1,39 +1,34 @@
 const express = require("express");
 
 const app = express();
-const{auth} = require('./middleware/auth');
+const connectDB = require('./config/database');
+const UserModel = require('./model/user');
 
-app.use("/user",auth)
-app.get("/user/userData",(req,res,next)=>{
-    res.send("user data sent");
+app.post("/signup", async(req,res)=>{
+    const user = new UserModel({
+        firstName: "KanikaS",
+        lastName: "Sabharwal",
+        emailId: "kS@gmail.com",
+        password: "124345",
+        age: 27,
+        gender: "F"
+
+    });
+    try{
+        await user.save();
+        res.send("user added successfully");
+
+    }catch(err){
+        res.status(400).send("error in saving : ", err.message);
+    }
 });
-app.delete("/user/deleteUser", (req,res)=>{
-    res.send("DELETED!!!!");
-})
 
-// app.use("/user", 
-//     ( (req,res,next)=>{
-//         console.log("1");
-//         // res.send("1");
-//         next();
-//     }),
-//     ( (req,res,next)=>{
-//         console.log("2");
-//         res.send("2");
-//         next();
-//     }),
-//     ((req,res,next)=>{
-//         console.log("3");
-//         res.send("3");
-//         next();
-//     }),
-//     ((req,res,next)=>{
-//         console.log("4");
-//         res.send("4");
-//         // next();
-//     })
-// );
 
-app.listen(3000, ()=>{
+connectDB().then(()=>{
+    console.log("connect success");
+    app.listen(3000, ()=>{
     console.log("server success");
+});
+}).catch((err)=>{
+    console.log("error: ", err);
 });
