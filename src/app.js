@@ -5,8 +5,11 @@ const connectDB = require('./config/database');
 const UserModel = require('./model/user');
 const {signUpValidator} = require('./helper/validator');
 const bcrypt = require('bcrypt');
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 
 app.use("/", express.json());
+app.use(cookieParser);
 
 
 app.post("/signup", async(req,res)=>{
@@ -30,19 +33,25 @@ app.post("/signup", async(req,res)=>{
 
     }catch(err){
         res.status(400).send("error in saving : ", err.message);
+        console.log(err.message);
     }
 });
 
 app.post("/login", async(req,res)=>{
     try{
         const {emailId, password} = req.body;
-          const user = await UserModel.find({emailId : userEmail});
+          const user = await UserModel.find({emailId : emailId});
           if(!user){
             throw new Error("Invalid Credentials");
           }
           const isPasswordMatched = await bcrypt.compare(password, user.password);
           if(isPasswordMatched){
             res.send("login success");
+            
+            //cookie
+            const token = await jwt.sign({_id: user._id}, "Dev@Tinder@kanika");
+
+            res.cookie("token", token);
           }else{
               throw new Error("Invalid Credentials");
           }
@@ -50,6 +59,12 @@ app.post("/login", async(req,res)=>{
         res.status(400).send("error");
     }
 });
+
+app.get("/profile", async(req,res)=>{
+    const cookies = req.cookies;
+    
+
+})
 
 app.get("/feed", async(req,res)=>{
     const userEmail = req.body.emailId;
