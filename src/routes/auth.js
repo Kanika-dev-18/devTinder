@@ -4,6 +4,13 @@ const UserModel = require('../model/user');
 const {signUpValidator} = require('../utils/validator');
 const bcrypt = require('bcrypt');
 
+const authCookieOptions = (expires) => ({
+    expires,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+});
+
 authRouter.post("/signup", async(req,res) => {
     try{
         console.log("POST /signup received");
@@ -24,9 +31,7 @@ authRouter.post("/signup", async(req,res) => {
     
         const token = await savedUser.getJWT();
 
-        res.cookie("token", token, {
-            expires: new Date(Date.now() + 8 * 3600000)
-        });
+        res.cookie("token", token, authCookieOptions(new Date(Date.now() + 8 * 3600000)));
         const userData = savedUser.toObject();
         delete userData.password;
         res.status(201).json({ data: userData });
@@ -46,14 +51,14 @@ authRouter.post("/login", async(req,res)=>{
             throw new Error("Invalid credentials");
         }
 
-        const isPasswordValid = user.validatePassword(password);
+        const isPasswordValid = await user.validatePassword(password);
 
         if(isPasswordValid){
             const token = await user.getJWT();
-            res.cookie("token", token,  {
-        expires: new Date(Date.now() + 8 * 3600000),
-      });
-        res.send(user);
+            res.cookie("token", token, authCookieOptions(new Date(Date.now() + 8 * 3600000)));
+            const userData = user.toObject();
+            delete userData.password;
+            res.send(userData);
         }else {
       throw new Error("Invalid credentials");
     }
@@ -63,9 +68,7 @@ authRouter.post("/login", async(req,res)=>{
 });
 
 authRouter.post("/logout", async (req, res) => {
-  res.cookie("token", null, {
-    expires: new Date(Date.now()),
-  });
+  res.cookie("token", null, authCookieOptions(new Date(0)));
   res.send("Logout Successful!!");
 });
 

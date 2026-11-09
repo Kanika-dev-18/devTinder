@@ -1,9 +1,26 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const connectDB = async()=>{
-    await mongoose.connect("mongodb+srv://sabhrwalkanika1999_db_user:6CxTCm6YmJX5NCvK@cluster0.dhcnhey.mongodb.net/devTinderDB");
-}
+let connectionPromise;
 
-module.exports = connectDB
+const connectDB = async () => {
+  const uri = process.env.MONGO_ATLAS_URL;
+  if (!uri) {
+    throw new Error("MONGO_ATLAS_URL is not configured");
+  }
 
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
 
+  if (!connectionPromise) {
+    connectionPromise = mongoose.connect(uri);
+  }
+
+  try {
+    return await connectionPromise;
+  } finally {
+    connectionPromise = undefined;
+  }
+};
+
+module.exports = connectDB;
