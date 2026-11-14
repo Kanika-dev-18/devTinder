@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const connectDB = require('./config/database');
 const app = express();
+const http = require("http");
 
 const cors = require('cors');
 const cookieParser = require('cookie-parser'); 
@@ -11,6 +12,9 @@ const authRouter = require('./routes/auth');
 const profileRouter = require('./routes/profile');
 const requestRouter = require('./routes/request');
 const userRouter = require('./routes/user');
+const initializeSocket = require("./utils/socket");
+const chatRouter = require("./routes/chat");
+
 app.use("/", express.json());
 app.use(cookieParser());
 
@@ -38,10 +42,14 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", chatRouter);
+
+const server = http.createServer(app);
+app.set("io", initializeSocket(server));
 
 if (require.main === module) {
     const port = process.env.PORT || 3000;
-    app.listen(port, () => {
+    server.listen(port, () => {
         console.log(`Server listening on port ${port}`);
     });
 }
