@@ -4,9 +4,15 @@ const ConnectionRequest = require("../model/connectionRequest");
 const getChatRoomId = require("./chatRoom");
 
 const initializeSocket = (server) => {
+
+    const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
   const io = socket(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: allowedOrigins,
     },
   });
 
